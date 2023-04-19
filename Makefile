@@ -23,6 +23,7 @@ masks_png: ## Generates masks from SVG files
 	convert masks_svg/1b.svg -negate -alpha Off masks_png/1b.png
 	convert masks_svg/1c.svg -negate -alpha Off masks_png/1c.png
 	convert masks_svg/1d.svg -negate -alpha Off masks_png/1d.png
+	convert masks_svg/2a.svg -negate -alpha Off masks_png/2a.png
 
 textures_masked: ## Generates gores and callots using masks
 	mkdir -p textures_masked
@@ -30,3 +31,4 @@ textures_masked: ## Generates gores and callots using masks
 	magick textures_raw/12237016.png masks_png/1b.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/1b.png
 	magick textures_raw/12237016.png masks_png/1c.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/1c.png
 	magick textures_raw/12237016.png masks_png/1d.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/1d.png
+	magick textures_raw/12237017.png masks_png/2a.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/2a.png
