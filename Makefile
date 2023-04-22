@@ -29,6 +29,11 @@ masks_png: ## Generates masks from SVG files
 	convert masks_svg/3a.svg -negate -alpha Off masks_png/3a.png
 	convert masks_svg/3b.svg -negate -alpha Off masks_png/3b.png
 	convert masks_svg/3c.svg -negate -alpha Off masks_png/3c.png
+	convert masks_svg/4a.svg -negate -alpha Off masks_png/4a.png
+	convert masks_svg/4b.svg -negate -alpha Off masks_png/4b.png
+	convert masks_svg/4c.svg -negate -alpha Off masks_png/4c.png
+	convert masks_svg/4d.svg -negate -alpha Off masks_png/4d.png
+	convert masks_svg/4e.svg -negate -alpha Off masks_png/4e.png
 
 textures_masked: ## Generates gores and callots using masks
 	mkdir -p textures_masked
@@ -42,3 +47,8 @@ textures_masked: ## Generates gores and callots using masks
 	magick textures_raw/12237018.jp2 masks_png/3a.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/3a.png
 	magick textures_raw/12237018.jp2 masks_png/3b.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/3b.png
 	magick textures_raw/12237018.jp2 masks_png/3c.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/3c.png
+	magick textures_raw/12237019.jp2 masks_png/4a.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/4a.png
+	magick textures_raw/12237019.jp2 masks_png/4b.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/4b.png
+	magick textures_raw/12237019.jp2 masks_png/4c.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/4c.png
+	magick textures_raw/12237019.jp2 masks_png/4d.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/4d.png
+	magick textures_raw/12237019.jp2 masks_png/4e.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/4e.png
