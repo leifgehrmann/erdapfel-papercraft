@@ -15,25 +15,32 @@ export PRINT_HELP_PYSCRIPT
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-all: masks_png textures_masked ## Generates all files, end-to-end
+all: textures_raw masks_png textures_masked ## Generates all files, end-to-end
+
+textures_raw.tar.gz:
+	tar --verbose --create --gzip --file textures_raw.tar.gz textures_raw/*.jp2
+
+textures_raw: ## Extracts the textures from the zip file and fixes a corrupt file
+	tar --extract --file textures_raw.tar.gz --directory ./
+	gdal_translate -of PNG -b 1 -b 2 -b 3 textures_raw/12237016.jp2 textures_raw/12237016.png --config GDAL_SKIP JP2MrSID --config GDAL_PAM_ENABLED NO
 
 masks_png: ## Generates masks from SVG files
 	mkdir -p masks_png
-	convert masks_svg/1a.svg -negate -alpha Off masks_png/1a.png
-	convert masks_svg/1b.svg -negate -alpha Off masks_png/1b.png
-	convert masks_svg/1c.svg -negate -alpha Off masks_png/1c.png
-	convert masks_svg/1d.svg -negate -alpha Off masks_png/1d.png
-	convert masks_svg/2a.svg -negate -alpha Off masks_png/2a.png
-	convert masks_svg/2b.svg -negate -alpha Off masks_png/2b.png
-	convert masks_svg/2c.svg -negate -alpha Off masks_png/2c.png
-	convert masks_svg/3a.svg -negate -alpha Off masks_png/3a.png
-	convert masks_svg/3b.svg -negate -alpha Off masks_png/3b.png
-	convert masks_svg/3c.svg -negate -alpha Off masks_png/3c.png
-	convert masks_svg/4a.svg -negate -alpha Off masks_png/4a.png
-	convert masks_svg/4b.svg -negate -alpha Off masks_png/4b.png
-	convert masks_svg/4c.svg -negate -alpha Off masks_png/4c.png
-	convert masks_svg/4d.svg -negate -alpha Off masks_png/4d.png
-	convert masks_svg/4e.svg -negate -alpha Off masks_png/4e.png
+	magick masks_svg/1a.svg -negate -alpha Off masks_png/1a.png
+	magick masks_svg/1b.svg -negate -alpha Off masks_png/1b.png
+	magick masks_svg/1c.svg -negate -alpha Off masks_png/1c.png
+	magick masks_svg/1d.svg -negate -alpha Off masks_png/1d.png
+	magick masks_svg/2a.svg -negate -alpha Off masks_png/2a.png
+	magick masks_svg/2b.svg -negate -alpha Off masks_png/2b.png
+	magick masks_svg/2c.svg -negate -alpha Off masks_png/2c.png
+	magick masks_svg/3a.svg -negate -alpha Off masks_png/3a.png
+	magick masks_svg/3b.svg -negate -alpha Off masks_png/3b.png
+	magick masks_svg/3c.svg -negate -alpha Off masks_png/3c.png
+	magick masks_svg/4a.svg -negate -alpha Off masks_png/4a.png
+	magick masks_svg/4b.svg -negate -alpha Off masks_png/4b.png
+	magick masks_svg/4c.svg -negate -alpha Off masks_png/4c.png
+	magick masks_svg/4d.svg -negate -alpha Off masks_png/4d.png
+	magick masks_svg/4e.svg -negate -alpha Off masks_png/4e.png
 
 textures_masked: ## Generates gores and callots using masks
 	mkdir -p textures_masked
