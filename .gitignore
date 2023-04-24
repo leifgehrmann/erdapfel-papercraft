@@ -1,4 +1,6 @@
 .DS_Store
+.idea
 masks_png
 textures_raw
 textures_masked
+printout

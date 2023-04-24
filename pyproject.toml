@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "erdapfel-papercraft"
+version = "0.0.0"
+description = "Printout your own erdapfel!"
+license = "MIT"
+authors = ["Leif Gehrmann"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+cairocffi = "^1.5.1"
+rectpack = "^0.2.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
