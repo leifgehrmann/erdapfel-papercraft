@@ -15,8 +15,6 @@ export PRINT_HELP_PYSCRIPT
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-all: textures_raw masks_png textures_masked ## Generates all files, end-to-end
-
 textures_raw.tar.gz:
 	tar --verbose --create --gzip --file textures_raw.tar.gz textures_raw/*.jp2
 
@@ -59,3 +57,6 @@ textures_masked: ## Generates gores and callots using masks
 	magick textures_raw/12237019.jp2 masks_png/4c.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/4c.png
 	magick textures_raw/12237019.jp2 masks_png/4d.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/4d.png
 	magick textures_raw/12237019.jp2 masks_png/4e.png -alpha Off -compose CopyOpacity -composite -trim +repage textures_masked/4e.png
+
+printout_a4_20cm: ## Generates printouts that generates a globe with a diameter of 20 cm
+	poetry run python printout.py 21.0 29.7 20 0.5 0.5
