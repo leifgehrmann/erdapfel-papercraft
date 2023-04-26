@@ -1,3 +1,5 @@
+![Generated printout example of the scripts in this project](example.png)
+
 # erdapfel-papercraft
 
 Print your own 1492 [Erdapfel](https://en.wikipedia.org/wiki/Erdapfel)!
