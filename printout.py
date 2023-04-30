@@ -21,29 +21,29 @@ pt_per_cm = 72 / 2.54
 # 31313px = circumference
 globe_diameter_actual_cm = 50
 globe_circumference_actual_px = 31313
-
-
 project_root_dir = Path(__file__).parent
-textures_masked_dir = project_root_dir.joinpath('textures_masked/')
-printout_dir = project_root_dir.joinpath('printout/')
-printout_dir.mkdir(exist_ok=True)
 
-if len(sys.argv) != 6:
-    print('printout.py [width] [height] [diameter] [margin] [sep]')
+if len(sys.argv) != 8:
+    print('printout.py [input] [width] [height] [diameter] [margin] [sep] [output]')
+    print('  [input]:     Input images (Must be PNGs)')
     print('  [width]:     Width of PDF in cm (A4 = 21.0)')
     print('  [height]:    Height of PDF in cm (A4 = 29.7)')
     print('  [diameter]:  Diameter of printed globe in cm')
-    print('  [margin]:    Margins of the PDF in cm')
-    print('  [sep]:       Blank space separation between textures in cm')
+    print('  [margin]:    CSV of Margins for the whole document in cm (top,right,bottom,left)')
+    print('  [sep]:       CSV of Margins between images in cm (top,right,bottom,left)')
+    print('  [output]:    Output directory of all the printout PDFs')
     print('')
-    print('Example: printout.py 21.0 29.7 20.0 0.5 0.5')
+    print('Example: printout.py textures_masked/ 21.0 29.7 20.0 0.2,0.5,0.2,0.5 0,0.5,0,0 printout/')
     exit(1)
 
-document_width_cm = float(sys.argv[1])
-document_height_cm = float(sys.argv[2])
-globe_diameter_printed_cm = float(sys.argv[3])
-margins_cm = float(sys.argv[4])
-sep_cm = float(sys.argv[5])
+textures_masked_dir = project_root_dir.joinpath(sys.argv[1])
+document_width_cm = float(sys.argv[2])
+document_height_cm = float(sys.argv[3])
+globe_diameter_printed_cm = float(sys.argv[4])
+margins_cm = list(map(lambda v: float(v), sys.argv[5].split(',')))
+sep_cm = list(map(lambda v: float(v), sys.argv[6].split(',')))
+printout_dir = project_root_dir.joinpath(sys.argv[7])
+printout_dir.mkdir(exist_ok=True)
 
 # Convert document units
 document_width_pt = document_width_cm * pt_per_cm
@@ -63,6 +63,8 @@ print('')
 # Read the image dimensions of all the images
 print('Reading image dimensions:')
 textures_masked_paths = os.listdir(textures_masked_dir)
+# Ignore non-PNG files
+textures_masked_paths = list(filter(lambda path: '.png' in path, textures_masked_paths))
 textures_masked_paths.sort()
 rectangles = []
 for textures_masked_name in textures_masked_paths:
@@ -78,8 +80,8 @@ for textures_masked_name in textures_masked_paths:
     png_height_cm = png_height_px / (globe_px_per_cm / print_scale)
     rectangles.append({
         'name': textures_masked_path.name,
-        'width_cm': png_width_cm + sep_cm * 2,
-        'height_cm': png_height_cm + sep_cm * 2,
+        'width_cm': png_width_cm + sep_cm[1] + sep_cm[3],
+        'height_cm': png_height_cm + sep_cm[0] + sep_cm[2],
     })
     print(' Done')
 
@@ -87,8 +89,8 @@ for textures_masked_name in textures_masked_paths:
 print('Preparing layout of images...', end='', flush=True)
 packer = newPacker()
 packer.add_bin(
-    document_width_cm - margins_cm,
-    document_height_cm - margins_cm,
+    document_width_cm - margins_cm[1] - margins_cm[3],
+    document_height_cm - margins_cm[0] - margins_cm[2],
     float('inf')
 )
 for rectangle in rectangles:
@@ -100,6 +102,17 @@ for rectangle in rectangles:
 
 packer.pack()
 print(' Done')
+
+# Verify all images have been packed.
+verify_actual = 0
+verify_expected = len(textures_masked_paths)
+for abin in packer:
+    verify_actual += len(abin)
+if verify_actual != verify_expected:
+    print('Error: Only %d out of %d were packed.' %
+          (verify_actual, verify_expected)
+    )
+    exit(1)
 
 # Render the PDFs
 print('Rendering %d PDFs:' % len(packer))
@@ -114,15 +127,15 @@ for abin in packer:
         document_height_pt
     )
     context = cairocffi.Context(surface)
-    context.translate(margins_cm * pt_per_cm, margins_cm * pt_per_cm)
+    context.translate(margins_cm[3] * pt_per_cm, margins_cm[0] * pt_per_cm)
 
     for rect in abin:
         # Render the rectangle (for debugging)
         # context.rectangle(
-        #     (rect.x + sep_cm) * pt_per_cm,
-        #     (rect.y + sep_cm) * pt_per_cm,
-        #     (rect.width - 2 * sep_cm) * pt_per_cm,
-        #     (rect.height - 2 * sep_cm) * pt_per_cm
+        #     (rect.x + sep_cm[3]) * pt_per_cm,
+        #     (rect.y + sep_cm[0]) * pt_per_cm,
+        #     (rect.width - sep_cm[1] - sep_cm[3]) * pt_per_cm,
+        #     (rect.height - sep_cm[0] - sep_cm[2]) * pt_per_cm
         # )
         # context.stroke()
 
@@ -136,8 +149,8 @@ for abin in packer:
         # Render the image
         context.save()
         context.translate(
-            (rect.x + sep_cm) * pt_per_cm,
-            (rect.y + sep_cm) * pt_per_cm,
+            (rect.x + sep_cm[3]) * pt_per_cm,
+            (rect.y + sep_cm[0]) * pt_per_cm,
         )
         new_scale = 1 / (globe_px_per_cm / print_scale) * pt_per_cm
         context.scale(

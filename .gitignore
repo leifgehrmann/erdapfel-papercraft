@@ -3,4 +3,6 @@
 masks_png
 textures_raw
 textures_masked
+textures_masked_hemispheres
 printout
+printout_combined*.pdf
